@@ -1,0 +1,1437 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScamBrake | Pause Before You Trust</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#10131f;color:#f5f6fc}
+header{padding:22px 7%;border-bottom:1px solid #30374a;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:25px;font-weight:800}
+.brand span,h1 span{color:#b8f36b}
+.tag{font-size:11px;color:#b8f36b;border:1px solid #526f3b;padding:8px 12px;border-radius:20px}
+main{max-width:1100px;margin:auto;padding:45px 22px}
+.eyebrow{color:#b8f36b;font-size:12px;letter-spacing:2px;font-weight:bold}
+h1{font-size:clamp(38px,7vw,65px);line-height:1.1;margin:15px 0}
+.intro{color:#a7aec2;line-height:1.8;max-width:650px;margin-bottom:30px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:#191e2d;border:1px solid #30374a;border-radius:18px;padding:25px}
+h2{font-size:20px;margin-top:0}
+.sub{color:#a7aec2;font-size:13px;line-height:1.7}
+.drop{display:block;border:1px dashed #68728c;border-radius:13px;padding:25px;text-align:center;cursor:pointer;margin:20px 0}
+.drop strong{display:block;margin:10px}
+.drop small{color:#a7aec2}
+input[type=file]{display:none}
+#fileName{color:#b7a5ff;font-size:12px;margin-top:12px;overflow-wrap:anywhere}
+label{display:block;color:#a7aec2;font-size:13px;margin:18px 0 8px}
+select,textarea{width:100%;padding:12px;background:#101522;color:white;border:1px solid #30374a;border-radius:9px;font:inherit}
+textarea{min-height:110px;resize:vertical}
+button{border:0;border-radius:10px;padding:14px;font-weight:bold;cursor:pointer}
+.primary{background:#b8f36b;color:#17200d;width:100%;margin-top:15px}
+.secondary{background:#30374a;color:white;width:100%;margin-top:12px}
+button:disabled{opacity:.6;cursor:not-allowed}
+.status{background:#101522;border-radius:9px;padding:12px;font-size:13px;color:#b7a5ff;line-height:1.7;margin:18px 0}
+.error{color:#ffaaaa}
+.success{color:#b8f36b}
+.result-label{color:#b7a5ff;font-size:11px;letter-spacing:1.5px;margin:22px 0 10px}
+#transcript{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px}
+.empty{text-align:center;color:#a7aec2;padding:35px 5px;line-height:1.8}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:22px}
+.feature{padding:19px;background:#191e2d;border:1px solid #30374a;border-radius:13px}
+.feature b{display:block;margin:10px 0}
+.feature p{font-size:12px;line-height:1.7;color:#a7aec2}
+.note,footer{font-size:12px;color:#a7aec2;line-height:1.8}
+footer{text-align:center;border-top:1px solid #30374a;padding:25px}
+#checks{margin-top:10px}
+.check-item{padding:13px;margin:10px 0;border:1px solid #30374a;border-radius:10px;background:#101522;line-height:1.7;font-size:13px}
+.check-item strong{display:block;margin-bottom:5px}
+.risk{padding:13px 15px;border-radius:10px;margin:12px 0;font-weight:700}
+.risk-high{background:#3a2028;border:1px solid #a84c5c;color:#ffb3bd}
+.risk-medium{background:#3b3220;border:1px solid #9b7a35;color:#ffe09a}
+.risk-low{background:#203328;border:1px solid #527b5d;color:#c1f4ce}
+.phrase{background:#553b1d;color:#ffe09a;border-radius:4px;padding:1px 3px}
+.small-note{font-size:11px;color:#a7aec2;line-height:1.7}
+.voice-box{margin-top:20px;padding-top:15px;border-top:1px solid #30374a}
+audio{width:100%;margin-top:15px}
+.recovery-card{margin-top:22px}
+.recovery-step{background:#101522;border:1px solid #30374a;border-radius:10px;padding:14px;margin:12px 0;font-size:13px;line-height:1.7}
+.recovery-step label{display:flex;gap:10px;align-items:flex-start;margin:0;color:#f5f6fc;cursor:pointer}
+.recovery-step input{margin-top:5px;accent-color:#b8f36b;flex:0 0 auto}
+.recovery-step input:checked+span{text-decoration:line-through;color:#a7aec2}
+.recovery-note{color:#ffe09a;font-size:12px;line-height:1.7;margin-top:15px}
+.recovery-progress{color:#b8f36b;font-size:12px;margin:12px 0}
+.emergency{background:#3a2028;border:1px solid #a84c5c;color:#ffb3bd;border-radius:10px;padding:14px;margin:14px 0;font-size:13px;line-height:1.7}
+.recovery-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.recovery-actions a{color:#b8f36b;font-size:13px;overflow-wrap:anywhere}
+.ai-guidance{border:1px solid #526f3b;background:#17231c;border-radius:12px;padding:15px;margin:15px 0}
+.ai-guidance h4{color:#b8f36b;margin:15px 0 8px}
+.ai-guidance p,.ai-guidance li{font-size:13px;line-height:1.8}
+.ai-guidance ul{padding-left:20px}
+.ai-label{color:#b8f36b;font-size:11px;letter-spacing:1.3px;font-weight:bold}
+#customSituationBox{display:none;margin-top:14px}
+#customSituation{min-height:90px}
+.field-hint{font-size:11px;color:#a7aec2;line-height:1.6;margin-top:7px}
+.replay-box{margin-top:22px;padding:18px;background:#141a29;border:1px solid #526f3b;border-radius:14px}
+.replay-intro{font-size:13px;color:#a7aec2;line-height:1.7}
+.replay-heading{color:#b8f36b;font-size:12px;letter-spacing:1.3px;font-weight:bold;margin:22px 0 10px}
+.replay-item{background:#101522;border:1px solid #30374a;border-radius:10px;padding:14px;margin:10px 0;font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.replay-item strong{display:block;color:#b8f36b;margin-bottom:6px}
+.replay-evidence{color:#ffe09a;font-style:italic;margin:5px 0}
+.replay-empty{font-size:13px;color:#a7aec2;padding:10px 0;line-height:1.7}
+.replay-note{background:#252b3b;border-radius:9px;padding:13px;margin-top:15px;font-size:12px;color:#c4cadd;line-height:1.7}
+#replayResult{margin-top:15px}
+@media(max-width:700px){
+ .layout,.features{grid-template-columns:1fr}
+ header{padding:18px}
+ .tag{font-size:9px}
+ main{padding:32px 16px}
+ .card{padding:19px}
+ .replay-box{padding:14px}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="brand">🛡 Scam<span>Brake</span></div>
+  <div class="tag">PAUSE BEFORE YOU TRUST</div>
+</header>
+
+<main>
+  <div class="eyebrow">YOUR VOICE. YOUR SAFETY. YOUR CONTROL.</div>
+  <h1>One suspicious call.<br><span>One smarter decision.</span></h1>
+
+  <p class="intro">
+    Worried about a suspicious call or message? Review the actual conversation,
+    understand possible warning signs, and decide your next safe step.
+    Designed for Hindi and Hinglish use cases.
+  </p>
+
+  <div class="layout">
+    <section class="card">
+      <h2>Analyse a conversation</h2>
+      <p class="sub">Upload a recording you are authorised to use, or paste a suspicious message.</p>
+
+      <label class="drop" for="audioFile">
+        <div style="font-size:34px">🎙️</div>
+        <strong>Choose an audio recording</strong>
+        <small>Click here · Maximum file size 15 MB</small>
+        <div id="fileName">No audio selected</div>
+      </label>
+
+      <input id="audioFile" type="file" accept="audio/*,.wav,.mp3,.m4a,.ogg,.webm">
+
+      <label for="language">Conversation language</label>
+      <select id="language">
+        <option value="hi-IN">Hindi / Hinglish (Hindi recognition)</option>
+        <option value="en-IN">Indian English</option>
+      </select>
+
+      <button class="primary" id="transcribeBtn">Transcribe audio →</button>
+
+      <p class="sub" style="text-align:center;margin:20px 0">— OR PASTE TEXT —</p>
+
+      <label for="message">Suspicious message or transcript</label>
+      <textarea id="message" placeholder="Example: Your account will be blocked. Tell me your OTP immediately..."></textarea>
+
+      <button class="secondary" id="analyseBtn">Check warning signs →</button>
+
+      <p class="note">
+        Audio is sent to the configured transcription service only when you press Transcribe.
+        Do not upload recordings without appropriate permission.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Conversation insights</h2>
+      <p class="sub">
+        Review the transcript and warning signs found by AI and rule-based checks.
+        These checks are not proof that a message is fraudulent.
+      </p>
+
+      <div id="status" class="status" role="status" aria-live="polite">
+        Ready. Upload audio or paste a message to begin.
+      </div>
+
+      <div class="result-label">TRANSCRIPT / MESSAGE</div>
+      <div id="transcript">
+        <div class="empty">🔎<br>Your conversation will appear here.</div>
+      </div>
+
+      <div id="checks"></div>
+
+      <div class="replay-box">
+        <div class="ai-label">NEW FEATURE · SCAM REPLAY LAB</div>
+        <h3>🧠 Understand how the scam works</h3>
+        <p class="replay-intro">
+          Go beyond the risk score. Explore the manipulation tactics,
+          exact red flags, possible consequences and safer responses
+          found in your analysed conversation.
+        </p>
+
+        <button class="primary" id="replayBtn" disabled>
+          Replay this conversation →
+        </button>
+
+        <div id="replayResult" aria-live="polite"></div>
+      </div>
+
+      <div class="voice-box">
+        <h3>🔊 Voice Safety Guidance</h3>
+        <p class="sub">Listen to the recommended safety actions using Gnani Timbre.</p>
+        <button class="secondary" id="speakBtn" disabled>Generate Voice Guidance</button>
+        <audio id="voicePlayer" controls style="display:none"></audio>
+      </div>
+    </section>
+  </div>
+
+  <section class="card recovery-card">
+    <h2>🛡️ Scam Recovery Assistant</h2>
+    <p class="sub">
+      Already shared information, clicked a suspicious link or transferred money?
+      Choose what happened to get immediate, situation-specific safety steps.
+    </p>
+
+    <label for="recoveryType">What happened?</label>
+    <select id="recoveryType">
+      <option value="">Select your situation</option>
+      <option value="nothing_done">I have not taken any action yet</option>
+      <option value="shared_otp">I shared OTP, UPI PIN or password</option>
+      <option value="shared_bank_details">I shared bank or card details</option>
+      <option value="sent_money">I transferred money</option>
+      <option value="clicked_link">I clicked a suspicious link</option>
+      <option value="installed_app">I installed an unknown app or shared my screen</option>
+      <option value="account_hacked">Someone stole or hacked my account</option>
+      <option value="threatened_blackmailed">Someone is threatening or blackmailing me</option>
+      <option value="other">Other — describe what happened</option>
+    </select>
+
+    <div id="customSituationBox">
+      <label for="customSituation">Describe what happened</label>
+      <textarea
+        id="customSituation"
+        maxlength="1500"
+        placeholder="Example: I shared my Aadhaar details with someone claiming to offer me a job..."
+      ></textarea>
+      <div class="field-hint">Describe only what happened. Do not enter OTPs, passwords, PINs or full card details.</div>
+    </div>
+
+    <button class="primary" id="recoveryBtn">Show my recovery steps →</button>
+    <div id="recoveryResult" aria-live="polite"></div>
+  </section>
+
+  <div class="features">
+    <div class="feature">🧩<b>Spot pressure tactics</b><p>Look for urgency, threats, requests for secrets, and unusual payment instructions.</p></div>
+    <div class="feature">🔍<b>Evidence, not guesses</b><p>Review exact words and treat unclear transcripts carefully. Text alone cannot prove a crime.</p></div>
+    <div class="feature">🧭<b>Choose a safer next step</b><p>Understand potential risks and learn how to verify a request independently.</p></div>
+  </div>
+</main>
+
+<footer>
+  ScamBrake is a safety aid, not a guarantee of fraud detection.<br>
+  Never share OTPs, PINs, passwords, or banking credentials.
+  Verify requests using official contact details.
+</footer>
+
+<script>
+const audioInput = document.getElementById("audioFile");
+const fileName = document.getElementById("fileName");
+const statusBox = document.getElementById("status");
+const transcript = document.getElementById("transcript");
+const transcribeBtn = document.getElementById("transcribeBtn");
+const analyseBtn = document.getElementById("analyseBtn");
+const messageInput = document.getElementById("message");
+const checksBox = document.getElementById("checks");
+const speakBtn = document.getElementById("speakBtn");
+const voicePlayer = document.getElementById("voicePlayer");
+const replayBtn = document.getElementById("replayBtn");
+const replayResult = document.getElementById("replayResult");
+const languageSelect = document.getElementById("language");
+
+const MAX_FILE_SIZE = 15 * 1024 * 1024;
+
+let latestAnalysis = null;
+let latestAnalysedText = "";
+let currentAudioUrl = null;
+
+function getSelectedLanguage() {
+  return languageSelect.value === "en-IN" ? "en-IN" : "hi-IN";
+}
+
+function isEnglish() {
+  return getSelectedLanguage() === "en-IN";
+}
+
+function setStatus(message,type="") {
+  statusBox.textContent = message;
+  statusBox.className = "status " + type;
+}
+
+function clearChecks() {
+  checksBox.replaceChildren();
+}
+
+function showTranscript(text) {
+  transcript.textContent = text;
+}
+
+function resetReplay() {
+  latestAnalysedText = "";
+  replayBtn.disabled = true;
+  replayResult.replaceChildren();
+}
+
+function getRiskChecks(text) {
+  const checks = [];
+
+  const patterns = [
+    {
+      title:"Sensitive information request",
+      reason:"The text mentions a credential or sensitive identifier.",
+      advice:"Do not share codes or passwords. Verify through the official app or number printed on your bank card.",
+      level:"high",
+      regex:/\botp\b|one.time.password|upi pin|password|cvv|verification code|ओटीपी|पासवर्ड|पिन|गुप्त कोड|आधार/iu
+    },
+    {
+      title:"Urgency or account threat",
+      reason:"The message may be pressuring you to act quickly or frightening you with an account-related consequence.",
+      advice:"Pause. Do not act under pressure; contact the organisation using independently verified details.",
+      level:"medium",
+      regex:/urgent|immediately|right now|today|abhi|turant|jaldi|last chance|blocked|suspend|digital arrest|खाता बंद|तुरंत|गिरफ्तार|डिजिटल अरेस्ट/iu
+    },
+    {
+      title:"Payment or money-transfer request",
+      reason:"The text refers to sending money, UPI, a QR code, or a payment-related instruction.",
+      advice:"Do not approve an unexpected payment or UPI collect request. Confirm the recipient and purpose independently.",
+      level:"high",
+      regex:/send money|transfer money|payment required|upi|pay now|paise bhej|paisa transfer|scan.{0,10}qr|collect request|refund fee|processing fee|पैसे भेज|भुगतान|यूपीआई|क्यूआर/iu
+    },
+    {
+      title:"Remote-access or screen-sharing request",
+      reason:"The message refers to remote-control software, app installation, or screen sharing.",
+      advice:"Do not install an app or grant screen access to an unverified caller.",
+      level:"high",
+      regex:/anydesk|teamviewer|screen.share|remote access|remote control|install this app|download this app|grant access|share your screen|ऐप इंस्टॉल|स्क्रीन शेयर|रिमोट एक्सेस/iu
+    },
+    {
+      title:"Threat or intimidation language",
+      reason:"The text mentions police, arrest, legal action, or another intimidating consequence.",
+      advice:"Do not pay or share personal details just to stop a threat. Verify any official claim through a trusted channel.",
+      level:"medium",
+      regex:/police|arrest|legal action|warrant|jail|fine|penalty|digital arrest|case filed|गिरफ्तार|पुलिस|जेल|वारंट|कानूनी कार्रवाई|डिजिटल अरेस्ट/iu
+    },
+    {
+      title:"Link or click request",
+      reason:"The message contains a web address or asks you to open a link.",
+      advice:"Avoid unexpected links. Open the official website or app yourself instead.",
+      level:"medium",
+      regex:/https?:\/\/\S+|www\.|click (?:this )?link|open this link|link par click|link kholo|लिंक पर क्लिक|लिंक खोल/iu
+    }
+  ];
+
+  patterns.forEach(pattern => {
+    if (pattern.regex.test(text)) checks.push(pattern);
+  });
+
+  return checks;
+}
+
+function highlightMatches(text,checks) {
+  const matches = [];
+
+  checks.forEach(check => {
+    const regex = new RegExp(
+      check.regex.source,
+      check.regex.flags.includes("g")
+        ? check.regex.flags
+        : check.regex.flags + "g"
+    );
+
+    for (const match of text.matchAll(regex)) {
+      if (match[0]) {
+        matches.push({
+          start:match.index,
+          end:match.index + match[0].length
+        });
+      }
+    }
+  });
+
+  matches.sort((a,b) => a.start-b.start || b.end-a.end);
+
+  const merged = [];
+
+  for (const item of matches) {
+    const last = merged[merged.length-1];
+
+    if (last && item.start <= last.end) {
+      last.end = Math.max(last.end,item.end);
+    } else {
+      merged.push({...item});
+    }
+  }
+
+  transcript.replaceChildren();
+  let cursor = 0;
+
+  merged.forEach(match => {
+    if (match.start > cursor) {
+      transcript.appendChild(
+        document.createTextNode(text.slice(cursor,match.start))
+      );
+    }
+
+    const mark = document.createElement("mark");
+    mark.className = "phrase";
+    mark.textContent = text.slice(match.start,match.end);
+    transcript.appendChild(mark);
+    cursor = match.end;
+  });
+
+  if (cursor < text.length) {
+    transcript.appendChild(
+      document.createTextNode(text.slice(cursor))
+    );
+  }
+
+  if (!merged.length) transcript.textContent = text;
+}
+
+function renderAnalysis(text) {
+  const checks = getRiskChecks(text);
+  clearChecks();
+
+  const heading = document.createElement("div");
+  heading.className = "result-label";
+  heading.textContent = "INITIAL SAFETY CHECKS";
+  checksBox.appendChild(heading);
+
+  const risk = document.createElement("div");
+  risk.className = "risk";
+
+  if (checks.some(c => c.level === "high")) {
+    risk.classList.add("risk-high");
+    risk.textContent = "Risk indicator: HIGH — high-priority warning keywords detected.";
+  } else if (checks.length) {
+    risk.classList.add("risk-medium");
+    risk.textContent = "Risk indicator: MEDIUM — possible warning signs detected.";
+  } else {
+    risk.classList.add("risk-low");
+    risk.textContent = "No warning keywords detected — this does NOT prove the message is safe.";
+  }
+
+  checksBox.appendChild(risk);
+
+  checks.forEach(check => {
+    const card = document.createElement("div");
+    card.className = "check-item";
+
+    const title = document.createElement("strong");
+    title.textContent = "⚠ " + check.title;
+
+    const reason = document.createElement("div");
+    reason.textContent = check.reason;
+
+    const advice = document.createElement("div");
+    advice.style.marginTop = "7px";
+    advice.textContent = "Safer next step: " + check.advice;
+
+    card.append(title,reason,advice);
+    checksBox.appendChild(card);
+  });
+
+  const note = document.createElement("p");
+  note.className = "small-note";
+  note.textContent = "This is a rule-based initial check, not a definitive fraud verdict.";
+  checksBox.appendChild(note);
+
+  highlightMatches(text,checks);
+}
+
+function resetVoice() {
+  latestAnalysis = null;
+  speakBtn.disabled = true;
+  voicePlayer.pause();
+  voicePlayer.removeAttribute("src");
+  voicePlayer.style.display = "none";
+  voicePlayer.load();
+
+  if (currentAudioUrl) {
+    URL.revokeObjectURL(currentAudioUrl);
+    currentAudioUrl = null;
+  }
+}
+
+async function generateVoice(text) {
+  const response = await fetch("/api/speak",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      text,
+      language:getSelectedLanguage()
+    })
+  });
+
+  if (!response.ok) {
+    let errorMessage = "Voice generation failed.";
+
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch {}
+
+    throw new Error(errorMessage);
+  }
+
+  const audioBlob = await response.blob();
+
+  if (!audioBlob.size) {
+    throw new Error("Timbre returned empty audio.");
+  }
+
+  if (currentAudioUrl) {
+    URL.revokeObjectURL(currentAudioUrl);
+  }
+
+  currentAudioUrl = URL.createObjectURL(audioBlob);
+  voicePlayer.src = currentAudioUrl;
+  voicePlayer.style.display = "block";
+  voicePlayer.load();
+
+  await voicePlayer.play();
+}
+
+async function analyseMessage(text) {
+  resetVoice();
+  resetReplay();
+  showTranscript(text);
+  setStatus("Analysing message...");
+
+  analyseBtn.disabled = true;
+  analyseBtn.textContent = "Analysing...";
+
+  try {
+    const response = await fetch("/api/analyze",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        text,
+        language:getSelectedLanguage()
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Analysis failed.");
+    }
+
+    latestAnalysis = data;
+    latestAnalysedText = text;
+
+    clearChecks();
+
+    const heading = document.createElement("h3");
+    heading.textContent = "SERVER-SIDE ANALYSIS";
+    checksBox.appendChild(heading);
+
+    const risk = document.createElement("h2");
+    risk.textContent = "Risk Level: " + data.risk_level;
+    risk.style.color =
+      data.risk_level === "HIGH" ? "#ff5b5b" :
+      data.risk_level === "MEDIUM" ? "#f5bd45" : "#65d69a";
+    checksBox.appendChild(risk);
+
+    const explanation = document.createElement("p");
+    explanation.textContent = data.explanation || "";
+    checksBox.appendChild(explanation);
+
+    function addSection(title,items) {
+      const section = document.createElement("div");
+      const sectionHeading = document.createElement("h4");
+      sectionHeading.textContent = title;
+      section.appendChild(sectionHeading);
+
+      if (!items || !items.length) {
+        const empty = document.createElement("p");
+        empty.textContent = "None detected.";
+        section.appendChild(empty);
+      } else {
+        const list = document.createElement("ul");
+
+        items.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          list.appendChild(li);
+        });
+
+        section.appendChild(list);
+      }
+
+      checksBox.appendChild(section);
+    }
+
+    addSection("Detected Scam Types",data.scam_types);
+    addSection("Warning Signs",data.warning_signs);
+    addSection("Recommended Safety Actions",data.recommended_actions);
+
+    const note = document.createElement("p");
+    note.className = "small-note";
+    note.textContent =
+      "Analysis uses Groq AI with rule-based checks when available. A LOW result does not guarantee safety.";
+    checksBox.appendChild(note);
+
+    highlightMatches(text,getRiskChecks(text));
+    speakBtn.disabled = false;
+    replayBtn.disabled = false;
+
+    setStatus(
+      "Analysis complete. You can now explore Scam Replay Lab or generate voice guidance.",
+      "success"
+    );
+
+  } catch (error) {
+    console.error("Analysis error:",error);
+
+    latestAnalysis = null;
+    resetReplay();
+    renderAnalysis(text);
+
+    setStatus("Server analysis unavailable: " + error.message,"error");
+
+  } finally {
+    analyseBtn.disabled = false;
+    analyseBtn.textContent = "Check warning signs →";
+  }
+}
+
+// --------------------------------------------------
+// SCAM REPLAY LAB FRONTEND
+// --------------------------------------------------
+
+function addReplayHeading(container,title) {
+  const heading = document.createElement("div");
+  heading.className = "replay-heading";
+  heading.textContent = title;
+  container.appendChild(heading);
+}
+
+function addReplayEmpty(container,message) {
+  const empty = document.createElement("p");
+  empty.className = "replay-empty";
+  empty.textContent = message;
+  container.appendChild(empty);
+}
+
+function renderReplayList(container,items,type) {
+  if (!Array.isArray(items) || !items.length) {
+    addReplayEmpty(
+      container,
+      type === "tactics"
+        ? "No specific manipulation tactic could be established from this message."
+        : type === "red_flags"
+          ? "No exact suspicious phrase was confirmed."
+          : "No additional information was returned."
+    );
+    return;
+  }
+
+  items.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "replay-item";
+
+    if (type === "tactics") {
+      const title = document.createElement("strong");
+      title.textContent = item.name;
+      card.appendChild(title);
+
+      if (item.evidence) {
+        const evidence = document.createElement("div");
+        evidence.className = "replay-evidence";
+        evidence.textContent = "Evidence: “" + item.evidence + "”";
+        card.appendChild(evidence);
+      }
+
+      const explanation = document.createElement("div");
+      explanation.textContent = item.explanation;
+      card.appendChild(explanation);
+
+    } else if (type === "red_flags") {
+      const phrase = document.createElement("strong");
+      phrase.textContent = "“" + item.phrase + "”";
+
+      const reason = document.createElement("div");
+      reason.textContent = item.why_it_matters;
+
+      card.append(phrase,reason);
+
+    } else {
+      card.textContent = item;
+    }
+
+    container.appendChild(card);
+  });
+}
+
+function renderReplay(data) {
+  replayResult.replaceChildren();
+
+  const risk = document.createElement("div");
+  risk.className = "risk " +
+    (data.risk_level === "HIGH"
+      ? "risk-high"
+      : data.risk_level === "MEDIUM"
+        ? "risk-medium"
+        : "risk-low");
+
+  risk.textContent = "Analysed risk level: " + data.risk_level;
+  replayResult.appendChild(risk);
+
+  addReplayHeading(replayResult,"1 · SCAM TACTICS");
+  renderReplayList(replayResult,data.tactics,"tactics");
+
+  addReplayHeading(replayResult,"2 · RED FLAG BREAKDOWN");
+  renderReplayList(replayResult,data.red_flags,"red_flags");
+
+  addReplayHeading(replayResult,"3 · WHAT COULD HAVE HAPPENED?");
+  renderReplayList(replayResult,data.possible_consequences,"consequences");
+
+  addReplayHeading(replayResult,"4 · HOW TO RESPOND SAFELY");
+  renderReplayList(replayResult,data.safe_response,"safe_response");
+
+  const note = document.createElement("div");
+  note.className = "replay-note";
+  note.textContent = "Analysis note: " +
+    (data.confidence_note ||
+      "This is an AI-supported explanation, not proof that fraud occurred.");
+
+  replayResult.appendChild(note);
+}
+
+replayBtn.addEventListener("click",async () => {
+  if (!latestAnalysis || !latestAnalysedText) {
+    setStatus("Please analyse a message first.","error");
+    return;
+  }
+
+  replayBtn.disabled = true;
+  replayBtn.textContent = "Analysing conversation...";
+  replayResult.replaceChildren();
+
+  const loading = document.createElement("div");
+  loading.className = "status";
+  loading.textContent = "Scam Replay Lab is examining the conversation. Please wait...";
+  replayResult.appendChild(loading);
+
+  try {
+    const response = await fetch("/api/replay-analysis",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        text:latestAnalysedText,
+        analysis:latestAnalysis,
+        language:getSelectedLanguage()
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Replay analysis failed.");
+    }
+
+    renderReplay(data);
+    setStatus("Scam Replay Lab analysis completed.","success");
+
+  } catch (error) {
+    console.error("Scam Replay Lab error:",error);
+    replayResult.replaceChildren();
+
+    const errorBox = document.createElement("div");
+    errorBox.className = "status error";
+    errorBox.textContent =
+      error.message || "Scam Replay Lab could not generate an explanation.";
+
+    replayResult.appendChild(errorBox);
+    setStatus("Scam Replay Lab could not complete the analysis.","error");
+
+  } finally {
+    replayBtn.disabled = false;
+    replayBtn.textContent = "Replay this conversation →";
+  }
+});
+
+// --------------------------------------------------
+// AUDIO FILE SELECTION
+// --------------------------------------------------
+
+audioInput.addEventListener("change",() => {
+  const file = audioInput.files[0];
+  fileName.textContent = file ? file.name : "No audio selected";
+
+  if (file && file.size > MAX_FILE_SIZE) {
+    setStatus("File is too large. Choose an audio file under 15 MB.","error");
+  } else if (file) {
+    setStatus("Audio selected. Click Transcribe audio when ready.");
+  }
+});
+
+// --------------------------------------------------
+// PRISMA TRANSCRIPTION
+// --------------------------------------------------
+
+transcribeBtn.addEventListener("click",async () => {
+  const file = audioInput.files[0];
+
+  if (!file) {
+    setStatus("Please choose an audio file first.","error");
+    return;
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    setStatus("Choose a file under 15 MB.","error");
+    return;
+  }
+
+  const form = new FormData();
+  form.append("audio",file);
+  form.append("language_code",getSelectedLanguage());
+
+  transcribeBtn.disabled = true;
+  analyseBtn.disabled = true;
+  transcribeBtn.textContent = "Transcribing...";
+
+  resetVoice();
+  resetReplay();
+  clearChecks();
+
+  setStatus("Sending audio for transcription. Please wait.");
+  showTranscript("Processing audio...");
+
+  try {
+    const response = await fetch("/api/transcribe",{
+      method:"POST",
+      body:form
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Transcription failed.");
+    }
+
+    const resultText =
+      typeof data.transcript === "string"
+        ? data.transcript.trim()
+        : "";
+
+    if (!resultText) {
+      showTranscript(
+        "The transcription service returned an empty transcript. Try a clearer recording."
+      );
+      setStatus("No words were returned. Try another recording.","error");
+      return;
+    }
+
+    messageInput.value = resultText;
+    renderAnalysis(resultText);
+
+    setStatus(
+      "Transcription complete. Running server-side analysis.",
+      "success"
+    );
+
+    await analyseMessage(resultText);
+
+  } catch (error) {
+    console.error("Transcription error:",error);
+    showTranscript("No transcript available yet.");
+
+    setStatus(
+      error.message || "Could not process audio. Check the server terminal.",
+      "error"
+    );
+
+  } finally {
+    transcribeBtn.disabled = false;
+    transcribeBtn.textContent = "Transcribe audio →";
+    analyseBtn.disabled = false;
+  }
+});
+
+// --------------------------------------------------
+// SERVER-SIDE ANALYSIS
+// --------------------------------------------------
+
+analyseBtn.addEventListener("click",async () => {
+  const text = messageInput.value.trim();
+
+  if (!text) {
+    setStatus("Please paste a message or transcribe an audio file first.","error");
+    return;
+  }
+
+  renderAnalysis(text);
+  await analyseMessage(text);
+});
+
+// --------------------------------------------------
+// TIMBRE VOICE GUIDANCE FOR ANALYSIS
+// --------------------------------------------------
+
+speakBtn.addEventListener("click",async () => {
+  if (!latestAnalysis) {
+    setStatus("Please analyse a message first.","error");
+    return;
+  }
+
+  const actions = latestAnalysis.recommended_actions || [];
+
+  const speechText = actions.length
+    ? "ScamBrake safety guidance. " + actions.join(". ")
+    : latestAnalysis.explanation;
+
+  if (!speechText || !speechText.trim()) {
+    setStatus("No safety guidance is available to speak.","error");
+    return;
+  }
+
+  speakBtn.disabled = true;
+  speakBtn.textContent = "Generating voice...";
+  setStatus("Timbre is generating voice guidance. Please wait.");
+
+  try {
+    await generateVoice(speechText);
+
+    setStatus(
+      isEnglish()
+        ? "English voice guidance generated successfully."
+        : "Hindi voice guidance generated successfully.",
+      "success"
+    );
+
+  } catch (error) {
+    console.error("Timbre error:",error);
+
+    setStatus(
+      error.message || "Could not generate voice. Check the server terminal.",
+      "error"
+    );
+
+  } finally {
+    speakBtn.disabled = false;
+    speakBtn.textContent = "Generate Voice Guidance";
+  }
+});
+
+// --------------------------------------------------
+// LANGUAGE CHANGE
+// --------------------------------------------------
+
+languageSelect.addEventListener("change",() => {
+  resetVoice();
+
+  // Existing analysis belongs to the previous selected language.
+  // Ask the user to analyse again before generating new guidance.
+  if (latestAnalysis) {
+    latestAnalysis = null;
+    speakBtn.disabled = true;
+    replayBtn.disabled = true;
+    replayResult.replaceChildren();
+
+    setStatus(
+      "Language changed. Analyse the message again to generate guidance in the selected language."
+    );
+  }
+});
+
+// --------------------------------------------------
+// SCAM RECOVERY ASSISTANT
+// --------------------------------------------------
+
+const recoveryBtn = document.getElementById("recoveryBtn");
+const recoveryType = document.getElementById("recoveryType");
+const recoveryResult = document.getElementById("recoveryResult");
+const customSituationBox = document.getElementById("customSituationBox");
+const customSituationInput = document.getElementById("customSituation");
+
+const situationMap = {
+  nothing_done:"nothing_done",
+  shared_otp:"shared_otp",
+  shared_bank_details:"shared_bank_details",
+  sent_money:"sent_money",
+  clicked_link:"clicked_link",
+  installed_app:"installed_app",
+  account_hacked:"account_hacked",
+  threatened_blackmailed:"threatened_blackmailed",
+  other:"other"
+};
+
+const fallbackMap = {
+  nothing_done:"nothing",
+  shared_otp:"otp",
+  shared_bank_details:"bank",
+  sent_money:"money",
+  clicked_link:"link",
+  installed_app:"remote",
+  account_hacked:"account_hacked",
+  threatened_blackmailed:"threatened_blackmailed",
+  other:"other"
+};
+
+recoveryType.addEventListener("change",() => {
+  const isOther = recoveryType.value === "other";
+  customSituationBox.style.display = isOther ? "block" : "none";
+
+  if (!isOther) customSituationInput.value = "";
+
+  recoveryResult.replaceChildren();
+});
+
+// --------------------------------------------------
+// BUILT-IN FALLBACK RECOVERY PLANS
+// --------------------------------------------------
+
+const recoveryPlans = {
+  nothing:{
+    title:"You have not taken any action yet",
+    emergency:"Do not respond to the suspicious person or share any information.",
+    steps:[
+      "Do not share OTPs, UPI PINs, passwords or banking details.",
+      "Do not transfer money or approve unexpected payment requests.",
+      "Do not install apps or share your screen with the caller.",
+      "Verify the claim using the organisation's official app or contact number.",
+      "Block and report the suspicious contact if appropriate."
+    ]
+  },
+
+  otp:{
+    title:"Secure your accounts immediately",
+    emergency:"If you shared your UPI PIN, OTP or password, contact your bank immediately using its official contact details.",
+    steps:[
+      "Contact your bank through its official app or the number printed on your card.",
+      "Ask your bank to block affected UPI, card or digital banking access as appropriate.",
+      "Change exposed banking passwords and credentials using official channels on a trusted device.",
+      "Check recent transactions and report unauthorised activity to your bank.",
+      "Never share another OTP, PIN or password with anyone claiming to help you."
+    ]
+  },
+
+  bank:{
+    title:"Protect your banking information",
+    emergency:"Contact your bank immediately if you shared card details, CVV, account credentials or other sensitive banking information.",
+    steps:[
+      "Contact your bank using independently verified contact details.",
+      "Ask whether your card should be blocked or replaced.",
+      "Ask the bank to secure your account and review suspicious transactions.",
+      "Change exposed passwords and PINs through official banking channels.",
+      "Enable transaction alerts and monitor your account."
+    ]
+  },
+
+  money:{
+    title:"Urgent: Report the financial fraud",
+    emergency:"Call your bank's official fraud helpline and India's cyber financial fraud helpline 1930 as soon as possible.",
+    steps:[
+      "Immediately report the transaction to your bank and request urgent action.",
+      "Call India's cyber financial fraud helpline 1930.",
+      "Submit a complaint at cybercrime.gov.in.",
+      "Save the transaction ID, UTR number, screenshots, caller number and messages.",
+      "Keep your complaint acknowledgement number and follow up with your bank."
+    ]
+  },
+
+  remote:{
+    title:"Secure your device after remote access",
+    emergency:"If someone may still control your device, disconnect it from the internet. Contact your bank using a different trusted device.",
+    steps:[
+      "Disconnect the affected device from Wi-Fi or mobile data if a remote session may still be active.",
+      "End the remote-access session. Do not follow further instructions from the caller.",
+      "Remove the suspicious remote-access application after the session has ended.",
+      "From another trusted device, contact your bank and secure your banking access.",
+      "Change exposed banking and email passwords from a separate trusted device.",
+      "If money was lost, call 1930 and report at cybercrime.gov.in."
+    ]
+  },
+
+  link:{
+    title:"Protect yourself after clicking a suspicious link",
+    emergency:"If you entered banking details, an OTP, UPI PIN or password on the website, contact your bank immediately.",
+    steps:[
+      "Close the suspicious website. Do not enter more information or download anything from it.",
+      "If you entered a password, change it using the official website or app on a trusted device.",
+      "If you entered banking details, OTP or UPI PIN, contact your bank immediately.",
+      "If you downloaded an unknown application or file, do not open it. Get your device checked.",
+      "Monitor your bank transactions and important account activity.",
+      "If money was lost, call 1930 and submit a complaint at cybercrime.gov.in."
+    ]
+  },
+
+  account_hacked:{
+    title:"Secure your potentially compromised account",
+    emergency:"Use a trusted device and the platform's official account recovery process. Contact your bank if financial accounts are affected.",
+    steps:[
+      "Use the official app or website to recover your account.",
+      "Change the password from a trusted device if you still have access.",
+      "Sign out of other active sessions and remove unfamiliar devices where the platform allows it.",
+      "Enable two-factor authentication after securing the account.",
+      "Warn your contacts not to trust unusual messages sent from your account.",
+      "If financial loss occurred, contact your bank and call 1930."
+    ]
+  },
+
+  threatened_blackmailed:{
+    title:"Stay safe and preserve evidence",
+    emergency:"If you are in immediate physical danger, contact local emergency services. Do not pay or send more private information under pressure.",
+    steps:[
+      "Do not send more money, passwords, private photos or personal information.",
+      "Save screenshots, messages, phone numbers, profile links and other evidence.",
+      "Avoid confronting the person or clicking links they send.",
+      "Block and report the account when it is safe to do so.",
+      "Report the incident through cybercrime.gov.in or seek help from local authorities.",
+      "Tell a trusted person if you feel unsafe or pressured."
+    ]
+  },
+
+  other:{
+    title:"General safety steps for your situation",
+    emergency:"Do not share additional sensitive information or make payments until you have independently verified what happened.",
+    steps:[
+      "Stop communicating with the suspicious person until the situation is verified.",
+      "Do not share OTPs, passwords, PINs, card details or identity documents.",
+      "Save relevant messages, screenshots, phone numbers and transaction details.",
+      "Verify the claim through the organisation's official contact details.",
+      "If money or banking access is affected, contact your bank immediately.",
+      "If financial fraud occurred, call 1930 and report at cybercrime.gov.in."
+    ]
+  }
+};
+
+function addRecoveryChecklist(container,steps) {
+  const progress = document.createElement("p");
+  progress.className = "recovery-progress";
+  progress.textContent = `0 of ${steps.length} steps completed`;
+  container.appendChild(progress);
+
+  const checkboxes = [];
+
+  steps.forEach((step,index) => {
+    const card = document.createElement("div");
+    card.className = "recovery-step";
+
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+
+    const text = document.createElement("span");
+    text.textContent = `${index+1}. ${step}`;
+
+    label.append(checkbox,text);
+    card.appendChild(label);
+    container.appendChild(card);
+    checkboxes.push(checkbox);
+  });
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change",() => {
+      const completed = checkboxes.filter(item => item.checked).length;
+      progress.textContent =
+        `${completed} of ${steps.length} steps completed`;
+    });
+  });
+}
+
+function addCyberCrimeLink(container) {
+  const links = document.createElement("div");
+  links.className = "recovery-actions";
+
+  const cyberLink = document.createElement("a");
+  cyberLink.href = "https://cybercrime.gov.in/";
+  cyberLink.target = "_blank";
+  cyberLink.rel = "noopener noreferrer";
+  cyberLink.textContent = "Official Cyber Crime Portal ↗";
+
+  links.appendChild(cyberLink);
+  container.appendChild(links);
+}
+
+function addRecoveryVoiceButton(container,title,emergency,steps) {
+  const voiceButton = document.createElement("button");
+  voiceButton.className = "primary";
+
+  function updateVoiceButtonText() {
+    voiceButton.textContent = isEnglish()
+      ? "🔊 Listen to English Safety Guidance"
+      : "🔊 Listen to Hindi Safety Guidance";
+  }
+
+  updateVoiceButtonText();
+
+  voiceButton.addEventListener("click",async () => {
+    voiceButton.disabled = true;
+    voiceButton.textContent = "Generating voice...";
+
+    try {
+      const speechText =
+        "ScamBrake emergency safety guidance. " +
+        title + ". " +
+        emergency + ". " +
+        steps.join(". ");
+
+      await generateVoice(speechText);
+
+      setStatus(
+        isEnglish()
+          ? "English recovery voice guidance generated successfully."
+          : "Hindi recovery voice guidance generated successfully.",
+        "success"
+      );
+
+    } catch (error) {
+      console.error("Recovery voice error:",error);
+
+      setStatus(
+        error.message || "Could not generate recovery voice guidance.",
+        "error"
+      );
+
+    } finally {
+      voiceButton.disabled = false;
+      updateVoiceButtonText();
+    }
+  });
+
+  container.appendChild(voiceButton);
+}
+
+function renderFallbackRecovery(selected) {
+  const planKey = fallbackMap[selected] || "other";
+  const plan = recoveryPlans[planKey];
+
+  if (!plan) return;
+
+  recoveryResult.replaceChildren();
+
+  const heading = document.createElement("h3");
+  heading.textContent = plan.title;
+  recoveryResult.appendChild(heading);
+
+  const emergency = document.createElement("div");
+  emergency.className = "emergency";
+  emergency.textContent = "⚠ IMPORTANT: " + plan.emergency;
+  recoveryResult.appendChild(emergency);
+
+  addRecoveryChecklist(recoveryResult,plan.steps);
+
+  addRecoveryVoiceButton(
+    recoveryResult,
+    plan.title,
+    plan.emergency,
+    plan.steps
+  );
+
+  addCyberCrimeLink(recoveryResult);
+
+  const note = document.createElement("p");
+  note.className = "recovery-note";
+  note.textContent =
+    "Backup guidance is being shown because AI guidance was unavailable. " +
+    "Never share OTPs, PINs or passwords. If money has been lost, contact your bank and call 1930 immediately.";
+
+  recoveryResult.appendChild(note);
+}
+
+function renderSituationGuidance(data) {
+  recoveryResult.replaceChildren();
+
+  const heading = document.createElement("h3");
+  heading.textContent = "Your Situation-Specific Safety Plan";
+  recoveryResult.appendChild(heading);
+
+  const aiLabel = document.createElement("div");
+  aiLabel.className = "ai-label";
+  aiLabel.textContent = "GROQ AI SITUATION ASSISTANT";
+  recoveryResult.appendChild(aiLabel);
+
+  const summary = document.createElement("div");
+  summary.className = "ai-guidance";
+
+  const summaryHeading = document.createElement("h4");
+  summaryHeading.textContent = "What this means";
+
+  const summaryText = document.createElement("p");
+  summaryText.textContent = data.situation_summary;
+
+  summary.append(summaryHeading,summaryText);
+  recoveryResult.appendChild(summary);
+
+  const steps = Array.isArray(data.immediate_steps)
+    ? data.immediate_steps.filter(
+        step => typeof step === "string" && step.trim()
+      )
+    : [];
+
+  if (!steps.length) {
+    throw new Error("AI did not return any immediate safety steps.");
+  }
+
+  const stepsHeading = document.createElement("h4");
+  stepsHeading.textContent = "Your immediate action plan";
+  recoveryResult.appendChild(stepsHeading);
+
+  addRecoveryChecklist(recoveryResult,steps);
+
+  if (data.prevention_tip) {
+    const prevention = document.createElement("div");
+    prevention.className = "ai-guidance";
+
+    const preventionHeading = document.createElement("h4");
+    preventionHeading.textContent = "Prevention tip";
+
+    const preventionText = document.createElement("p");
+    preventionText.textContent = data.prevention_tip;
+
+    prevention.append(preventionHeading,preventionText);
+    recoveryResult.appendChild(prevention);
+  }
+
+  if (data.emergency_advice) {
+    const emergency = document.createElement("div");
+    emergency.className = "emergency";
+    emergency.textContent = "⚠ IMPORTANT: " + data.emergency_advice;
+    recoveryResult.appendChild(emergency);
+  }
+
+  addRecoveryVoiceButton(
+    recoveryResult,
+    data.situation_summary,
+    data.emergency_advice || "",
+    steps
+  );
+
+  addCyberCrimeLink(recoveryResult);
+
+  const note = document.createElement("p");
+  note.className = "small-note";
+  note.textContent =
+    "AI-generated guidance. Verify urgent financial or account-related actions with your bank through official contact details.";
+
+  recoveryResult.appendChild(note);
+}
+
+async function getSituationGuidance(selected) {
+  const situation = situationMap[selected];
+
+  if (!situation) {
+    throw new Error("Invalid situation selected.");
+  }
+
+  const messageText = messageInput.value.trim() ||
+    "The user has selected a situation in ScamBrake and needs general cyber safety guidance.";
+
+  const customSituation = customSituationInput.value.trim();
+
+  const response = await fetch("/api/situation-assistant",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      text:messageText,
+      situation,
+      customSituation:selected === "other" ? customSituation : "",
+      language:getSelectedLanguage()
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || "Situation Assistant request failed.");
+  }
+
+  if (
+    typeof data.situation_summary !== "string" ||
+    !Array.isArray(data.immediate_steps) ||
+    typeof data.prevention_tip !== "string"
+  ) {
+    throw new Error("The AI returned an incomplete guidance response.");
+  }
+
+  return data;
+}
+
+// --------------------------------------------------
+// RECOVERY BUTTON
+// --------------------------------------------------
+
+recoveryBtn.addEventListener("click",async () => {
+  const selected = recoveryType.value;
+  recoveryResult.replaceChildren();
+
+  if (!selected) {
+    recoveryResult.className = "recovery-note";
+    recoveryResult.textContent = "Please select what happened first.";
+    return;
+  }
+
+  if (
+    selected === "other" &&
+    !customSituationInput.value.trim()
+  ) {
+    recoveryResult.className = "recovery-note";
+    recoveryResult.textContent =
+      "Please describe what happened in the text box.";
+    customSituationInput.focus();
+    return;
+  }
+
+  if (customSituationInput.value.length > 1500) {
+    recoveryResult.className = "recovery-note";
+    recoveryResult.textContent =
+      "Your description must be under 1500 characters.";
+    return;
+  }
+
+  recoveryResult.className = "";
+  recoveryBtn.disabled = true;
+  recoveryBtn.textContent = "Generating your safety plan...";
+
+  const loading = document.createElement("p");
+  loading.className = "status";
+  loading.textContent =
+    "Groq AI is preparing guidance for your situation. Please wait.";
+
+  recoveryResult.appendChild(loading);
+
+  try {
+    const guidance = await getSituationGuidance(selected);
+
+    recoveryResult.replaceChildren();
+    renderSituationGuidance(guidance);
+
+    setStatus(
+      "Situation-specific AI safety guidance generated successfully.",
+      "success"
+    );
+
+  } catch (error) {
+    console.error("Situation Assistant error:",error);
+
+    recoveryResult.replaceChildren();
+    renderFallbackRecovery(selected);
+
+    setStatus(
+      "AI guidance unavailable. Showing the built-in recovery plan instead.",
+      "error"
+    );
+
+  } finally {
+    recoveryBtn.disabled = false;
+    recoveryBtn.textContent = "Show my recovery steps →";
+  }
+});
+</script>
+</body>
+</html>

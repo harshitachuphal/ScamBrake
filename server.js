@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import multer from "multer";
 import dotenv from "dotenv";
 import fs from "node:fs/promises";
@@ -111,18 +111,20 @@ async function callGroq(messages, temperature = 0.2) {
 // CONTEXT-AWARE SAFETY HELPERS
 // --------------------------------------------------
 
-// Remove sentences that warn users NOT to share credentials.
-// This prevents safe warnings from being mistaken for scam requests.
-
 function removeSafetyWarningSentences(text) {
   return String(text || "")
     .split(/(?<=[.!?।])\s+|\n+/)
     .filter(sentence => {
-      const isWarning =
-        /(?:never|do not|don't|dont|should not|shouldn't|must not|avoid)\s+(?:ever\s+)?(?:share|send|tell|reveal|disclose|provide|give|enter|submit)/i.test(sentence) ||
-        /(?:कभी भी|कभी|मत)\s*(?:अपना|अपनी|अपने)?\s*(?:OTP|UPI PIN|PIN|CVV|पासवर्ड)?\s*(?:किसी के साथ)?\s*(?:शेयर|साझा|बताएं|बताएँ|न बताएं|न बताएं)/i.test(sentence);
+      const normalized = sentence.trim();
 
-      return !isWarning;
+      const englishWarning =
+        /(?:never|do not|don't|dont|should not|shouldn't|must not|avoid)\s+(?:ever\s+)?(?:share|send|tell|reveal|disclose|provide|give|enter|submit)/i.test(normalized);
+
+      const hindiWarning =
+        /(?:OTP|UPI\s*PIN|PIN|CVV|ओटीपी|पिन|पासवर्ड|बैंक की जानकारी).{0,60}(?:न\s+बताएं|न\s+बताइए|न\s+दें|न\s+दीजिए|मत बताएं|मत बताइए|मत दें|साझा न करें|शेयर न करें|किसी को न दें|किसी को न बताएं)/i.test(normalized) ||
+        /(?:कभी भी|कभी|मत)\s*(?:अपना|अपनी|अपने)?\s*(?:OTP|UPI PIN|PIN|CVV|पासवर्ड|ओटीपी|पिन)?\s*(?:किसी के साथ|किसी को)?\s*(?:शेयर|साझा|बताएं|बताएँ|बताइए|दें|दीजिए)/i.test(normalized);
+
+      return !(englishWarning || hindiWarning);
     })
     .join(" ");
 }
@@ -133,26 +135,25 @@ function removeSafetyWarningSentences(text) {
 function hasCredentialRequest(text) {
   const actionableText = removeSafetyWarningSentences(text);
 
-  const credential =
-    "(?:OTP|one.time.password|UPI\\s*PIN|PIN|CVV|password|verification code|ओटीपी|पासवर्ड|पिन)";
+  const credentialPattern =
+    /OTP|one.time.password|UPI\s*PIN|ATM\s*PIN|एटीएम\s*पिन|CVV|password|verification code|ओटीपी|पासवर्ड|पिन/i;
 
-  const requestPatterns = [
-    new RegExp(
-      `\\b(?:share|send|tell|reveal|disclose|provide|give|enter|submit)\\b.{0,65}${credential}`,
-      "i"
-    ),
-    new RegExp(
-      `${credential}.{0,55}\\b(?:share|send|tell|reveal|disclose|provide|give|enter|submit)\\b`,
-      "i"
-    ),
-    /(?:अपना|अपनी)\s*(?:OTP|UPI PIN|PIN|CVV|पासवर्ड|ओटीपी)\s*(?:बताएं|बताइए|भेजें|दर्ज करें|शेयर करें|साझा करें)/i
-  ];
+  const requestPattern =
+    /share|send|tell|reveal|disclose|provide|give|enter|submit|बताइए|बताएं|बताएँ|बताओ|भेजें|भेजिए|बताना|शेयर करें|साझा करें|दर्ज करें|डालें|लिखें|दे दीजिए|दीजिए/i;
 
-  return requestPatterns.some(pattern => pattern.test(actionableText));
+  const sentences = actionableText
+    .split(/[.!?।\n]+/)
+    .filter(sentence => sentence.trim());
+
+  return sentences.some(sentence =>
+    credentialPattern.test(sentence) &&
+    requestPattern.test(sentence)
+  );
 }
 
-// Identify two common harmless message contexts.
-// These checks apply only when there are no concrete scam indicators.
+// --------------------------------------------------
+// BENIGN MESSAGE CONTEXT HELPERS
+// --------------------------------------------------
 
 function isBenignInterviewInvitation(text) {
   const lower = String(text || "").toLowerCase();
@@ -451,7 +452,6 @@ app.post("/api/speak", async (req, res) => {
 function runRuleBasedAnalysis(text, language) {
   const hindi = language === "hi-IN";
 
-  // Ignore sentences that warn users not to share credentials.
   const actionableText = removeSafetyWarningSentences(text);
 
   const credentialRequest = hasCredentialRequest(text);
@@ -483,7 +483,7 @@ function runRuleBasedAnalysis(text, language) {
       type: hindi
         ? "डर या जल्दबाजी दिखाकर धोखाधड़ी"
         : "Urgency / Threat Scam",
-      pattern: /account.{0,30}(block|suspend|close)|digital arrest|police.{0,30}arrest|arrest.{0,30}immediately|खाता बंद|गिरफ्तार|डिजिटल अरेस्ट/i,
+      pattern: /account.{0,50}(block|suspend|close)|digital arrest|police.{0,30}arrest|arrest.{0,30}immediately|(?:खाता|अकाउंट|बैंक खाता).{0,60}(?:बंद|ब्लॉक|सीज|निलंबित)|(?:बंद|ब्लॉक).{0,60}(?:खाता|अकाउंट)|गिरफ्तार|डिजिटल अरेस्ट/i,
       risk: "HIGH",
       reason: hindi
         ? "संदेश में डर या धमकी देकर आप पर तुरंत कार्रवाई करने का दबाव बनाया जा रहा है।"
@@ -734,10 +734,6 @@ async function getCombinedAnalysis(text, language) {
   try {
     const aiResult = await runGroqAnalysis(text, language);
 
-    // --------------------------------------------------
-    // SAFE CONTEXT OVERRIDES
-    // --------------------------------------------------
-
     if (
       ruleResult.risk_level === "LOW" &&
       isBenignInterviewInvitation(text)
@@ -794,19 +790,11 @@ async function getCombinedAnalysis(text, language) {
       };
     }
 
-    // --------------------------------------------------
-    // COMBINE RULE-BASED AND AI RESULTS
-    // --------------------------------------------------
-
     const order = {
       LOW: 1,
       MEDIUM: 2,
       HIGH: 3
     };
-
-    // Strong rule-based evidence can raise risk.
-    // AI-only generic suspicion cannot automatically make
-    // a message HIGH when no concrete scam indicator exists.
 
     let finalRisk;
 
@@ -863,8 +851,6 @@ async function getCombinedAnalysis(text, language) {
 
   } catch (error) {
     console.error("Groq analysis failed:", error.message);
-
-    // Still apply safe context overrides if Groq is unavailable.
 
     if (
       ruleResult.risk_level === "LOW" &&
@@ -1152,10 +1138,6 @@ IMPORTANT RULES:
       }
     ]);
 
-    // --------------------------------------------------
-    // VALIDATE TACTICS
-    // --------------------------------------------------
-
     const tactics = Array.isArray(result.tactics)
       ? result.tactics
           .filter(x =>
@@ -1177,10 +1159,6 @@ IMPORTANT RULES:
             explanation: x.explanation.slice(0, 500)
           }))
       : [];
-
-    // --------------------------------------------------
-    // EXACT RED FLAG VALIDATION + FALLBACK
-    // --------------------------------------------------
 
     const aiRedFlags = Array.isArray(result.red_flags)
       ? result.red_flags
@@ -1213,10 +1191,6 @@ IMPORTANT RULES:
 
     const redFlags = combinedFlags.slice(0, 8);
 
-    // --------------------------------------------------
-    // VALIDATE POSSIBLE CONSEQUENCES
-    // --------------------------------------------------
-
     const consequences = Array.isArray(result.possible_consequences)
       ? result.possible_consequences
           .filter(x =>
@@ -1233,17 +1207,12 @@ IMPORTANT RULES:
           .slice(0, 5)
       : [];
 
-    // --------------------------------------------------
-    // VALIDATE SAFE RESPONSES
-    // --------------------------------------------------
-
     let safeResponse = Array.isArray(result.safe_response)
       ? result.safe_response
           .filter(x => typeof x === "string" && x.trim())
           .slice(0, 6)
       : [];
 
-    // Never allow an AI-generated, unverified bank phone number.
     const containsPhoneNumber = value =>
       /(?:\+?\d[\d\s().\-–—‑]{7,}\d)/.test(value);
 
@@ -1499,10 +1468,6 @@ Do not assume that requested actions were completed.
 
     let preventionTip = result.prevention_tip.trim();
     let emergencyAdvice = result.emergency_advice.trim();
-
-    // --------------------------------------------------
-    // SAFETY CHECKS FOR CUSTOM SITUATIONS
-    // --------------------------------------------------
 
     const deniedMoney = explicitlyDeniedMoneyTransfer(incidentText);
     const deniedCredentials = explicitlyDeniedCredentialSharing(incidentText);
